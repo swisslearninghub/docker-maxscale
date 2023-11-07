@@ -21,6 +21,8 @@ config_file="/etc/maxscale.cnf"
 cat <<EOF > $config_file
 [maxscale]
 threads=$MAX_THREADS
+admin_secure_gui = false
+admin_host = 0.0.0.0
 
 [Galera Service]
 type=service
@@ -35,7 +37,7 @@ enable_root_user=$ENABLE_ROOT_USER
 [Galera Listener]
 type=listener
 service=Galera Service
-protocol=MySQLClient
+protocol=MariaDBClient
 port=$ROUTER_PORT
 
 [Splitter Service]
@@ -51,12 +53,13 @@ use_sql_variables_in=$USE_SQL_VARIABLES_IN
 [Splitter Listener]
 type=listener
 service=Splitter Service
-protocol=MySQLClient
+protocol=MariaDBClient
 port=$SPLITTER_PORT
 
 [Galera Monitor]
 type=monitor
-module=galeramon
+;module=galeramon
+module=mariadbmon
 servers=${BACKEND_SERVER_LIST// /,}
 disable_master_failback=1
 user=$MAX_USER
@@ -81,7 +84,7 @@ cat <<EOF >> $config_file
 type=server
 address=${backend_servers[$i]}
 port=$BACKEND_SERVER_PORT
-protocol=MySQLBackend
+protocol=MariaDBBackend
 persistpoolmax=$PERSIST_POOLMAX
 persistmaxtime=$PERSIST_MAXTIME
 
